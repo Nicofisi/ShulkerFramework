@@ -9,7 +9,7 @@ dependencies {
 
 repositories {
     maven {
-        name 'ShulkerFramework GitHub Packages'
+        name 'ShulkerFramework-GitHub-Packages'
         url 'https://maven.pkg.github.com/nicofisi/shulkerframework'
     }
 }
@@ -24,7 +24,7 @@ dependencies {
 
 repositories {
     maven {
-        name = "ShulkerFramework GitHub Packages"
+        name = "ShulkerFramework-GitHub-Packages"
         url = uri("https://maven.pkg.github.com/nicofisi/shulkerframework")
     }
 }
