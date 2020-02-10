@@ -28,7 +28,9 @@ version of the framework in action.
 dependencies {
     implementation 'me.nicofisi:shulker-framework:VERSION'
 }
+```
 
+```gradle
 repositories {
     maven {
         name 'ShulkerFramework-GitHub-Packages'
@@ -43,7 +45,9 @@ repositories {
 dependencies {
     implementation("me.nicofisi:shulker-framework:VERSION")
 }
+```
 
+```gradle
 repositories {
     maven {
         name = "ShulkerFramework-GitHub-Packages"
@@ -54,13 +58,15 @@ repositories {
 
 ##### Maven
 
-```maven
+```xml
 <dependency>
     <groupId>me.nicofisi</groupId>
     <artifactId>shulker-framework</artifactId>
     <version>VERSION</version>
 </dependency>
+```
 
+```xml
 <repository>
     <id>shulkerframework-github-packages</id>
     <name>ShulkerFramework GitHub Packages</name>
