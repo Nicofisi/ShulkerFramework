@@ -1,4 +1,4 @@
-## ShulkerFramework
+# ShulkerFramework ![Travis Shield](https://img.shields.io/travis/Nicofisi/ShulkerFramework) ![License Badge](https://img.shields.io/github/license/Nicofisi/ShulkerFramework) ![Code Size Badge](https://img.shields.io/github/languages/code-size/Nicofisi/ShulkerFramework)
 The project is not yet ready to be used in production,
 although I plan to keep updating and expanding it,
 since I need it for my server.
