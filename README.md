@@ -1,4 +1,4 @@
-### Artifacts
+## Artifacts
 
 ##### Gradle Groovy DSL
 
