@@ -1,7 +1,6 @@
 ## Artifacts
 
 ##### Gradle Groovy DSL
-
 ```gradle
 dependencies {
     implementation 'me.nicofisi:shulker-framework:VERSION'
@@ -14,8 +13,8 @@ repositories {
     }
 }
 ```
-##### Gradle Kotlin DSL
 
+##### Gradle Kotlin DSL
 ```gradle
 dependencies {
     implementation("me.nicofisi:shulker-framework:VERSION")
@@ -30,7 +29,6 @@ repositories {
 ```
 
 ##### Maven
-
 ```maven
 <dependency>
     <groupId>me.nicofisi</groupId>
