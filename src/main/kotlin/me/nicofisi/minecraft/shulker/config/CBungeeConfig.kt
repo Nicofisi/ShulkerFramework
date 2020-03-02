@@ -4,16 +4,27 @@ import net.md_5.bungee.config.Configuration
 import net.md_5.bungee.config.ConfigurationProvider
 import net.md_5.bungee.config.YamlConfiguration
 import java.io.File
+import java.io.StringWriter
 import java.lang.ClassCastException
 
 abstract class CBungeeConfig : CConfig<Configuration>(BungeeYamlConfigurationWrapper())
 
+/**
+ * Note: headers are not available in the Bungee config API, so ShulkerFramework uses its own method
+ */
 class BungeeYamlConfigurationWrapper : YamlConfigurationWrapper<Configuration>() {
     private val yamlProvider: ConfigurationProvider = ConfigurationProvider.getProvider(YamlConfiguration::class.java)
+    private var header: String? = null
 
     override fun loadFromFile(file: File): Configuration = yamlProvider.load(file)
 
     override fun saveToFile(configuration: Configuration, file: File) {
+        val sw = StringWriter()
+        yamlProvider.save(configuration, sw)
+        file.writeText(
+            // eventual header, then the actual contents
+            (header?.let { it + System.lineSeparator() } ?: "") + sw.toString()
+        )
         yamlProvider.save(configuration, file)
     }
 
@@ -25,11 +36,8 @@ class BungeeYamlConfigurationWrapper : YamlConfigurationWrapper<Configuration>()
         configuration.set(path, value)
     }
 
-    /**
-     * Not available in net.md_5.bungee.config
-     */
     override fun setHeader(configuration: Configuration, header: String) {
-
+        this.header = header
     }
 
     override fun getValues(configuration: Configuration): Map<String, Any?> {
