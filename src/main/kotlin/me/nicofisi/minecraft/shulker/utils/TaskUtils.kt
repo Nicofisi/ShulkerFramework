@@ -5,11 +5,14 @@ import net.md_5.bungee.api.ProxyServer
 import net.md_5.bungee.api.scheduler.ScheduledTask
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitTask
+import java.lang.UnsupportedOperationException
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 fun runTask(task: () -> Unit): CTask {
-    require(!isBungee) { "Only runTaskAsync, runTaskLaterAsync and runTaskTimerAsync are supported on BungeeCord" }
+    if (!isBungee) throw UnsupportedOperationException(
+        "Only runTaskAsync, runTaskLaterAsync and runTaskTimerAsync are supported on BungeeCord"
+    )
 
     return Bukkit.getScheduler().runTask(PluginInfo.Spigot.plugin, enhanceTask(task))
             .run { CTask(this) }
@@ -26,7 +29,8 @@ fun runTaskAsync(task: () -> Unit): CTask {
 }
 
 fun runTaskLater(delay: Duration, task: () -> Unit): CTask {
-    require(!isBungee) { "Only runTaskAsync, runTaskLaterAsync and runTaskTimerAsync are supported on BungeeCord" }
+    if (!isBungee) throw UnsupportedOperationException(
+            "Only runTaskAsync, runTaskLaterAsync and runTaskTimerAsync are supported on BungeeCord")
 
     return Bukkit.getScheduler().runTaskLater(PluginInfo.Spigot.plugin, enhanceTask(task), delay.toMillis() / 50)
             .run { CTask(this) }
@@ -43,7 +47,9 @@ fun runTaskLaterAsync(delay: Duration, task: () -> Unit): CTask {
 }
 
 fun runTaskTimer(delayToFirst: Duration, delayBetween: Duration, task: () -> Unit): CTask {
-    require(!isBungee) { "Only runTaskAsync, runTaskLaterAsync and runTaskTimerAsync are supported on BungeeCord" }
+    if (!isBungee) throw UnsupportedOperationException(
+        "Only runTaskAsync, runTaskLaterAsync and runTaskTimerAsync are supported on BungeeCord"
+    )
 
     return Bukkit.getScheduler().runTaskTimer(
             PluginInfo.Spigot.plugin, enhanceTask(task), delayToFirst.toMillis() / 50, delayBetween.toMillis() / 50)
