@@ -37,9 +37,9 @@ open class CCommandExecutor(vararg val commands: CCommand) {
                 cc.requirements.forEach { it.validate(sender, cc) }
 
                 val argsAfterJoin = {
-                    var tempArgs = args.take(cc.arguments.size)
+                    val tempArgs = args.take(cc.arguments.size).toMutableList()
                     if (args.size >= cc.arguments.size) {
-                        tempArgs += args.drop(cc.arguments.size).joinToString(" ")
+                        tempArgs.add(args.drop(cc.arguments.size).joinToString(" "))
                     }
                     tempArgs
                 }()
@@ -47,8 +47,7 @@ open class CCommandExecutor(vararg val commands: CCommand) {
                 val parsedArgs = CParsedArguments(cc.arguments.withIndex().map { (index, cArg) ->
                     val arg = argsAfterJoin.getOrNull(index)
                     if (arg != null) {
-                        val parsed = cArg.cType.parse(arg)
-                        when (parsed) {
+                        when (val parsed = cArg.cType.parse(arg)) {
                             is Either.Left -> parsed.a // the parsed value
                             is Either.Right -> {
                                 sender.sendHardcodedError(parsed.b) // the parse fail reason
@@ -65,8 +64,9 @@ open class CCommandExecutor(vararg val commands: CCommand) {
                     }
                 })
 
-                val exec = { cc.execute(sender, parsedArgs) }
-                if (cc.javaClass.isAnnotationPresent(ExecuteAsync::class.java)) {
+                val runAsync = cc.javaClass.isAnnotationPresent(ExecuteAsync::class.java)
+                val exec = { cc.execute(sender, parsedArgs, ExecutionExtras(label)) }
+                if (runAsync) {
                     runTaskAsync { exec() }
                 } else {
                     exec()

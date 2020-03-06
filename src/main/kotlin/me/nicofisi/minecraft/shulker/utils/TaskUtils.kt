@@ -10,7 +10,7 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 fun runTask(task: () -> Unit): CTask {
-    if (!isBungee) throw UnsupportedOperationException(
+    if (isBungee) throw UnsupportedOperationException(
         "Only runTaskAsync, runTaskLaterAsync and runTaskTimerAsync are supported on BungeeCord"
     )
 
@@ -29,7 +29,7 @@ fun runTaskAsync(task: () -> Unit): CTask {
 }
 
 fun runTaskLater(delay: Duration, task: () -> Unit): CTask {
-    if (!isBungee) throw UnsupportedOperationException(
+    if (isBungee) throw UnsupportedOperationException(
             "Only runTaskAsync, runTaskLaterAsync and runTaskTimerAsync are supported on BungeeCord")
 
     return Bukkit.getScheduler().runTaskLater(PluginInfo.Spigot.plugin, enhanceTask(task), delay.toMillis() / 50)
@@ -47,7 +47,7 @@ fun runTaskLaterAsync(delay: Duration, task: () -> Unit): CTask {
 }
 
 fun runTaskTimer(delayToFirst: Duration, delayBetween: Duration, task: () -> Unit): CTask {
-    if (!isBungee) throw UnsupportedOperationException(
+    if (isBungee) throw UnsupportedOperationException(
         "Only runTaskAsync, runTaskLaterAsync and runTaskTimerAsync are supported on BungeeCord"
     )
 

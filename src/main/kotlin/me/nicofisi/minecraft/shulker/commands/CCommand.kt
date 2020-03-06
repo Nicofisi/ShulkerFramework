@@ -13,10 +13,12 @@ interface CCommand {
 
     val requirements: List<CRequirement>
 
-    fun execute(sender: CommandSender, args: CParsedArguments): Unit = execute(sender)
+    fun execute(sender: CommandSender, args: CParsedArguments, extras: ExecutionExtras): Unit = execute(sender)
 
     fun execute(sender: CommandSender): Unit = throw NotImplementedError()
 }
+
+data class ExecutionExtras(val label: String)
 
 object CCommandWithArgs {
     operator fun invoke(cmdAliases: List<String>, helpDesc: String,
@@ -27,7 +29,7 @@ object CCommandWithArgs {
         override val arguments = cmdArgs
         override val requirements = reqs
 
-        override fun execute(sender: CommandSender, args: CParsedArguments) = onExecute(sender, args)
+        override fun execute(sender: CommandSender, args: CParsedArguments, extras: ExecutionExtras) = onExecute(sender, args)
     }
 }
 
@@ -60,15 +62,20 @@ object CParentCommand {
         override val requirements = emptyList<CRequirement>()
 
         // TODO multiple help pages
-        override fun execute(sender: CommandSender, args: CParsedArguments) {
-            fun showHelp(sender: CommandSender, unknownAlias: String? = null) {
-                if (unknownAlias != null) { // TODO label
-                    sender.sendColored("Command &p/...".colored + unknownAlias + "&scould not be found".colored)
+        override fun execute(sender: CommandSender, args: CParsedArguments, extras: ExecutionExtras) {
+
+            /**
+             * @param unknownSubcommand If showing help is triggered by stumbling upon an unknown subcommand argument,
+             * an error line is sent first, explaining what happened
+             */
+            fun showHelp(sender: CommandSender, unknownSubcommand: String? = null) {
+                if (unknownSubcommand != null) { // TODO label
+                    sender.sendColored("Command &p/${extras.label}".colored + unknownSubcommand + "&scould not be found".colored)
                 }
-                sender.sendColored("Help for &p/... ${aliases.first()}") // TODO label
+                sender.sendColored("Help for &p/${extras.label} ${aliases.first()}") // TODO label
                 children.forEach {
                     // TODO label
-                    sender.sendColored("/... ${aliases.first()} &p${it.aliases.first()} &s- ${it.helpDescription}")
+                    sender.sendColored("/${extras.label} ${aliases.first()} &p${it.aliases.first()} &s- ${it.helpDescription}")
                 }
             }
 

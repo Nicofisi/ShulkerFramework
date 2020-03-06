@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.nicofisi"
-version = "0.7"
+version = "0.8.0"
 
 repositories {
     maven { setUrl("https://dl.bintray.com/kotlin/kotlin-eap") }
