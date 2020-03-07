@@ -15,6 +15,10 @@ repositories {
     jcenter()
 
     maven {
+        setUrl("https://dl.bintray.com/arrow-kt/arrow-kt/")
+    }
+
+    maven {
         name = "paperspigot-repo"
         setUrl("https://repo.destroystokyo.com/repository/maven-public/")
     }
@@ -29,6 +33,7 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
     implementation("net.md-5:bungeecord-api:1.15-SNAPSHOT")
+    implementation("io.arrow-kt:arrow-core:0.10.4")
 }
 
 tasks {
