@@ -24,15 +24,18 @@ data class ExecutionExtras(val labelList: List<String>) {
 }
 
 object CCommandWithArgs {
-    operator fun invoke(cmdAliases: List<String>, helpDesc: String,
-                        reqs: List<CRequirement>, cmdArgs: List<CArgument<Any>>,
-                        onExecute: (CommandSender, CParsedArguments) -> Unit): CCommand = object : CCommand {
+    operator fun invoke(
+        cmdAliases: List<String>, helpDesc: String,
+        reqs: List<CRequirement>, cmdArgs: List<CArgument<Any>>,
+        onExecute: (CommandSender, CParsedArguments) -> Unit
+    ): CCommand = object : CCommand {
         override val aliases = cmdAliases
         override val helpDescription = helpDesc
         override val arguments = cmdArgs
         override val requirements = reqs
 
-        override fun execute(sender: CommandSender, args: CParsedArguments, extras: ExecutionExtras) = onExecute(sender, args)
+        override fun execute(sender: CommandSender, args: CParsedArguments, extras: ExecutionExtras) =
+            onExecute(sender, args)
     }
 }
 
@@ -42,8 +45,10 @@ abstract class CCommandAbstract : CCommand {
 }
 
 object CCommandNoArgs {
-    operator fun invoke(cmdAliases: List<String>, helpDesc: String, reqs: List<CRequirement> = emptyList(),
-                        onExecute: (CommandSender) -> Unit): CCommand = object : CCommand {
+    operator fun invoke(
+        cmdAliases: List<String>, helpDesc: String, reqs: List<CRequirement> = emptyList(),
+        onExecute: (CommandSender) -> Unit
+    ): CCommand = object : CCommand {
         override val aliases = cmdAliases
         override val helpDescription = helpDesc
         override val arguments = emptyList<CArgument<Any>>()
@@ -54,14 +59,17 @@ object CCommandNoArgs {
 }
 
 object CParentCommand {
-    operator fun invoke(cmdAliases: List<String>, helpDesc: String,
-                        vararg children: CCommand): CCommand = object : CCommand {
+    operator fun invoke(
+        cmdAliases: List<String>, helpDesc: String,
+        vararg children: CCommand
+    ): CCommand = object : CCommand {
         @Suppress("UnnecessaryVariable") // an IntelliJ bug
         override val aliases = cmdAliases
         override val helpDescription = helpDesc
         override val arguments = listOf(
-                CArgument(StringType, "subcommand", defValue = { Pair("help", "help") }),
-                CArgument(StringType, "arguments", isRequired = false))
+            CArgument(StringType, "subcommand", defValue = { Pair("help", "help") }),
+            CArgument(StringType, "arguments", isRequired = false)
+        )
         override val requirements = emptyList<CRequirement>()
 
         // TODO multiple help pages

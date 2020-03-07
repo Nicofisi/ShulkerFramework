@@ -2,19 +2,13 @@ package me.nicofisi.minecraft.shulker.commands
 
 import arrow.core.Either
 import arrow.core.Left
-import arrow.core.Option
 import arrow.core.Right
-import arrow.core.getOrElse
-import arrow.core.orElse
 import me.nicofisi.minecraft.shulker.utils.colored
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.OfflinePlayer
 import org.bukkit.World
 import org.bukkit.entity.Player
-import java.lang.IllegalArgumentException
-import java.lang.NumberFormatException
-import java.lang.RuntimeException
 import java.math.BigInteger
 import java.util.*
 
@@ -52,8 +46,8 @@ object GameModeType : CType<GameMode> {
     }
 
     override fun tabSuggestions(mustStartWith: String) =
-            listOf("survival", "creative", "adventure", "spectator")
-                    .filter { it.startsWith(mustStartWith.toLowerCase()) }
+        listOf("survival", "creative", "adventure", "spectator")
+            .filter { it.startsWith(mustStartWith.toLowerCase()) }
 }
 
 object IntegerType : CType<Int> {
@@ -101,11 +95,11 @@ object OfflinePlayerType : CType<OfflinePlayer> {
     override fun parse(string: String): ParseResult<OfflinePlayer> {
         @Suppress("DEPRECATION") // needed here
         return Bukkit.getOfflinePlayer(string)?.let { Left(it) }
-                ?: try {
-                    Left(Bukkit.getOfflinePlayer(UUID.fromString(string)))
-                } catch (ex: IllegalArgumentException) {
-                    Right("&sNo player named &p$string &scould be found".colored)
-                }
+            ?: try {
+                Left(Bukkit.getOfflinePlayer(UUID.fromString(string)))
+            } catch (ex: IllegalArgumentException) {
+                Right("&sNo player named &p$string &scould be found".colored)
+            }
     }
 
     override fun tabSuggestions(mustStartWith: String) = PlayerType.tabSuggestions(mustStartWith)
@@ -117,19 +111,19 @@ object OfflinePlayerType : CType<OfflinePlayer> {
 object PlayerType : CType<Player> {
     override fun parse(string: String): ParseResult<Player> {
         return Bukkit.getPlayerExact(string)?.let { Left(it) }
-                ?: try {
-                    Left(Bukkit.getPlayer(UUID.fromString(string)) ?: throw RuntimeException())
-                } catch (ex: Exception) { // IllegalArgumentException from UUID.fromString, or RuntimeException from above
-                    val players = Bukkit.getOnlinePlayers().filter { it.name.startsWith(string, ignoreCase = true) }
-                    when {
-                        players.isEmpty() ->
-                            Right("&sNo online player could be found whose name starts with &p$string".colored)
-                        players.size > 1 ->
-                            Right("&sThere are currently multiple players online whose names start with &p$string".colored)
-                        else ->
-                            Left(players.first())
-                    }
+            ?: try {
+                Left(Bukkit.getPlayer(UUID.fromString(string)) ?: throw RuntimeException())
+            } catch (ex: Exception) { // IllegalArgumentException from UUID.fromString, or RuntimeException from above
+                val players = Bukkit.getOnlinePlayers().filter { it.name.startsWith(string, ignoreCase = true) }
+                when {
+                    players.isEmpty() ->
+                        Right("&sNo online player could be found whose name starts with &p$string".colored)
+                    players.size > 1 ->
+                        Right("&sThere are currently multiple players online whose names start with &p$string".colored)
+                    else ->
+                        Left(players.first())
                 }
+            }
     }
 }
 
@@ -153,5 +147,5 @@ object WorldType : CType<World> {
     }
 
     override fun tabSuggestions(mustStartWith: String) =
-            Bukkit.getWorlds().map { it.name }.filter { it.startsWith(mustStartWith, ignoreCase = true) }
+        Bukkit.getWorlds().map { it.name }.filter { it.startsWith(mustStartWith, ignoreCase = true) }
 }

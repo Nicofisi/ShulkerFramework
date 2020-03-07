@@ -80,8 +80,9 @@ open class CCommandExecutor(vararg val commands: CCommand) {
                 sender.sendError("&pAn error has occurred while attempting to perform your command".colored)
                 if (sender !is ConsoleCommandSender) {
                     sender.sendError(
-                            "The error: &p${ex.javaClass.canonicalName}" +
-                                    if (ex.message == null) "" else ": " + ex.message)
+                        "The error: &p${ex.javaClass.canonicalName}" +
+                                if (ex.message == null) "" else ": " + ex.message
+                    )
                 }
                 ex.printStackTrace()
             }

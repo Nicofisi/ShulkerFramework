@@ -5,7 +5,6 @@ import me.nicofisi.minecraft.shulker.utils.dataFolder
 import me.nicofisi.minecraft.shulker.utils.logError
 import me.nicofisi.minecraft.shulker.utils.logInfo
 import me.nicofisi.minecraft.shulker.utils.logWarning
-import java.lang.ClassCastException
 import java.nio.file.Files
 
 abstract class CConfig<T>(val wrapper: YamlConfigurationWrapper<T>) {
@@ -44,8 +43,8 @@ abstract class CConfig<T>(val wrapper: YamlConfigurationWrapper<T>) {
         loadDefaultValues()
 
         val currentConfigVersion = javaClass.classLoader.getResource("current-config-version.txt")
-                ?.readText()?.trim()?.toInt()
-                ?: error("The file current-config-version.txt is missing from the file $dataFolder}")
+            ?.readText()?.trim()?.toInt()
+            ?: error("The file current-config-version.txt is missing from the file $dataFolder}")
 
         if (!Files.exists(configFile)) {
             val yaml = wrapper.newConfiguration()
@@ -111,7 +110,8 @@ abstract class CConfig<T>(val wrapper: YamlConfigurationWrapper<T>) {
         }
     }
 
-    fun getConfigHeader(): String? = CConfig::class.java.classLoader?.getResource("config-header.md")?.readText()?.trim()
+    fun getConfigHeader(): String? =
+        CConfig::class.java.classLoader?.getResource("config-header.md")?.readText()?.trim()
 
     protected fun logParseElseWarning(key: String) {
         logWarning("Unknown config key: $key")

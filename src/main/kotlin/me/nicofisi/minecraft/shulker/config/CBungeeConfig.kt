@@ -5,7 +5,6 @@ import net.md_5.bungee.config.ConfigurationProvider
 import net.md_5.bungee.config.YamlConfiguration
 import java.io.File
 import java.io.StringWriter
-import java.lang.ClassCastException
 
 abstract class CBungeeConfig : CConfig<Configuration>(BungeeYamlConfigurationWrapper())
 

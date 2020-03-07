@@ -1,7 +1,6 @@
 package me.nicofisi.minecraft.shulker.config
 
 import java.io.File
-import java.lang.ClassCastException
 
 abstract class YamlConfigurationWrapper<T> {
     abstract fun loadFromFile(file: File): T
