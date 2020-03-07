@@ -14,6 +14,7 @@ import org.bukkit.World
 import org.bukkit.entity.Player
 import java.lang.IllegalArgumentException
 import java.lang.NumberFormatException
+import java.lang.RuntimeException
 import java.math.BigInteger
 import java.util.*
 
@@ -64,7 +65,7 @@ object IntegerType : CType<Int> {
                 BigInteger(string)
                 Right("&sThe number &p$string &sis too big, it should be at most ${Int.MAX_VALUE}".colored)
             } catch (ex: NumberFormatException) {
-                Right("&p$string &sis not an integer".colored)
+                Right("&sThe text &p$string &sis not an integer".colored)
             }
         }
     }
@@ -79,7 +80,7 @@ object LongType : CType<Long> {
                 BigInteger(string)
                 Right("&sThe number &p$string &sis too big, it should be at most ${Long.MAX_VALUE}".colored)
             } catch (ex: NumberFormatException) {
-                Right("&p$string &sis not an integer".colored)
+                Right("&sThe text &p$string &sis not an integer".colored)
             }
         }
     }
@@ -90,7 +91,7 @@ object DoubleType : CType<Double> {
         return try {
             Left(string.toDouble())
         } catch (ex: NumberFormatException) {
-            Right("&p$string is not a floating-point number".colored)
+            Right("&sThe text &p$string is not a floating-point number".colored)
         }
     }
 }
@@ -117,8 +118,8 @@ object PlayerType : CType<Player> {
     override fun parse(string: String): ParseResult<Player> {
         return Bukkit.getPlayerExact(string)?.let { Left(it) }
                 ?: try {
-                    Left(Bukkit.getPlayer(UUID.fromString(string)))
-                } catch (ex: IllegalArgumentException) {
+                    Left(Bukkit.getPlayer(UUID.fromString(string)) ?: throw RuntimeException())
+                } catch (ex: Exception) { // IllegalArgumentException from UUID.fromString, or RuntimeException from above
                     val players = Bukkit.getOnlinePlayers().filter { it.name.startsWith(string, ignoreCase = true) }
                     when {
                         players.isEmpty() ->

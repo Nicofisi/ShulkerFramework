@@ -2,6 +2,7 @@ package me.nicofisi.minecraft.shulker.commands
 
 import me.nicofisi.minecraft.shulker.utils.colored
 import me.nicofisi.minecraft.shulker.utils.sendColored
+import me.nicofisi.minecraft.shulker.utils.sendHeader
 import org.bukkit.command.CommandSender
 
 interface CCommand {
@@ -18,7 +19,9 @@ interface CCommand {
     fun execute(sender: CommandSender): Unit = throw NotImplementedError()
 }
 
-data class ExecutionExtras(val label: String)
+data class ExecutionExtras(val labelList: List<String>) {
+    val label = labelList.joinToString(" ")
+}
 
 object CCommandWithArgs {
     operator fun invoke(cmdAliases: List<String>, helpDesc: String,
@@ -70,12 +73,12 @@ object CParentCommand {
              */
             fun showHelp(sender: CommandSender, unknownSubcommand: String? = null) {
                 if (unknownSubcommand != null) { // TODO label
-                    sender.sendColored("Command &p/${extras.label}".colored + unknownSubcommand + "&scould not be found".colored)
+                    sender.sendMessage("Command &p/${extras.label} &t".colored + unknownSubcommand + " &scould not be found".colored)
                 }
-                sender.sendColored("Help for &p/${extras.label} ${aliases.first()}") // TODO label
+                sender.sendHeader("Help for &p/".colored + extras.label)
                 children.forEach {
                     // TODO label
-                    sender.sendColored("/${extras.label} ${aliases.first()} &p${it.aliases.first()} &s- ${it.helpDescription}")
+                    sender.sendColored("/${extras.label} &p${it.aliases.first()} &s- ${it.helpDescription}")
                 }
             }
 
@@ -88,11 +91,11 @@ object CParentCommand {
 
                 val child = children.find { it.aliases.contains(argAlias) }
                 if (child != null) {
-                    sender.sendColored(args[1] as String? + " | " + argAlias.length + " | " + argArgs.joinToString { ", " })
-                    argArgs.forEach {
-                        sender.sendMessage(it)
-                    }
-                    CCommandExecutor.handleCCommand(sender, child, argAlias, argArgs)
+//                    sender.sendColored(args[1] as String? + " | " + argAlias.length + " | " + argArgs.joinToString { ", " })
+//                    argArgs.forEach {
+//                        sender.sendMessage(it)
+//                    }
+                    CCommandExecutor.handleCCommand(sender, child, extras.labelList + argAlias, argArgs)
                 } else {
                     showHelp(sender, argAlias)
                 }

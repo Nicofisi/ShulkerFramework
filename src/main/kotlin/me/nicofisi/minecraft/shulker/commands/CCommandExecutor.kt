@@ -2,6 +2,7 @@ package me.nicofisi.minecraft.shulker.commands
 
 import arrow.core.Either
 import me.nicofisi.minecraft.shulker.PluginInfo
+import me.nicofisi.minecraft.shulker.utils.colored
 import me.nicofisi.minecraft.shulker.utils.runTaskAsync
 import me.nicofisi.minecraft.shulker.utils.sendError
 import me.nicofisi.minecraft.shulker.utils.sendHardcodedError
@@ -23,7 +24,7 @@ open class CCommandExecutor(vararg val commands: CCommand) {
                 }
 
                 override fun execute(sender: CommandSender, commandLabel: String, args: Array<out String>): Boolean {
-                    handleCCommand(sender, cc, label, args.toList())
+                    handleCCommand(sender, cc, listOf(commandLabel), args.toList())
                     return true
                 }
             }
@@ -32,17 +33,15 @@ open class CCommandExecutor(vararg val commands: CCommand) {
     }
 
     companion object {
-        fun handleCCommand(sender: CommandSender, cc: CCommand, label: String, args: List<String>) {
+        fun handleCCommand(sender: CommandSender, cc: CCommand, label: List<String>, args: List<String>) {
             fun doHandle() {
                 cc.requirements.forEach { it.validate(sender, cc) }
 
-                val argsAfterJoin = {
-                    val tempArgs = args.take(cc.arguments.size).toMutableList()
-                    if (args.size >= cc.arguments.size) {
-                        tempArgs.add(args.drop(cc.arguments.size).joinToString(" "))
-                    }
-                    tempArgs
-                }()
+                val argsAfterJoin = args.take(cc.arguments.size - 1) +
+                        if (args.size >= cc.arguments.size)
+                            listOf(args.drop(cc.arguments.size - 1).joinToString(" "))
+                        else
+                            emptyList()
 
                 val parsedArgs = CParsedArguments(cc.arguments.withIndex().map { (index, cArg) ->
                     val arg = argsAfterJoin.getOrNull(index)
@@ -57,7 +56,7 @@ open class CCommandExecutor(vararg val commands: CCommand) {
                     } else {
                         val value = cArg.defValue(sender)?.first
                         if (value == null && cArg.isRequired) {
-                            sender.sendError("")
+                            sender.sendError("&sThe argument &p${cArg.name} &sis required".colored) // TODO what is this??
                             return@doHandle
                         }
                         value
@@ -78,7 +77,7 @@ open class CCommandExecutor(vararg val commands: CCommand) {
             } catch (ex: CommonRequirementException) {
                 ex.requirement.sendErrorMessage(sender, ex.message)
             } catch (ex: Throwable) {
-                sender.sendError("An error has occurred while attempting to perform your command")
+                sender.sendError("&pAn error has occurred while attempting to perform your command".colored)
                 if (sender !is ConsoleCommandSender) {
                     sender.sendError(
                             "The error: &p${ex.javaClass.canonicalName}" +

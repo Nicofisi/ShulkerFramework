@@ -16,16 +16,20 @@ object PluginInfo {
     var secondaryColor: Char = '1'
         private set
 
+    var accentColor: Char = '6'
+        private set
+
     object Spigot {
         lateinit var plugin: JavaPlugin
             private set
 
-        fun init(plugin: JavaPlugin, primaryColor: Char, secondaryColor: Char) {
+        fun init(plugin: JavaPlugin, primaryColor: Char, secondaryColor: Char, accentColor: Char) {
             require(!wasInit) { "The PluginInfo class has already been initialized" }
 
             Spigot.plugin = plugin
             PluginInfo.primaryColor = primaryColor
             PluginInfo.secondaryColor = secondaryColor
+            PluginInfo.accentColor = accentColor
 
             wasInit = true
             isBungee = false
@@ -36,12 +40,13 @@ object PluginInfo {
         lateinit var plugin: Plugin
             private set
 
-        fun init(plugin: Plugin, primaryColor: Char, secondaryColor: Char) {
+        fun init(plugin: Plugin, primaryColor: Char, secondaryColor: Char, accentColor: Char) {
             require(!wasInit) { "The PluginInfo class has already been initialized" }
 
             Bungee.plugin = plugin
             PluginInfo.primaryColor = primaryColor
             PluginInfo.secondaryColor = secondaryColor
+            PluginInfo.accentColor = accentColor
 
             wasInit = true
             isBungee = true
