@@ -19,7 +19,7 @@ open class CCommandExecutor(vararg val commands: CCommand) {
             val command = object : Command(cc.aliases.first()) {
                 init {
                     this.description = cc.helpDescription
-                    this.usageMessage = "TODO" // TODO
+                    this.usageMessage = cc.getCorrectUsage(null, listOf(cc.aliases.first()), emptyList())
                     this.aliases = cc.aliases
                 }
 
@@ -33,30 +33,44 @@ open class CCommandExecutor(vararg val commands: CCommand) {
     }
 
     companion object {
-        fun handleCCommand(sender: CommandSender, cc: CCommand, label: List<String>, args: List<String>) {
+        fun handleCCommand(sender: CommandSender, cc: CCommand, labelList: List<String>, args: List<String>) {
             fun doHandle() {
                 cc.requirements.forEach { it.validate(sender, cc) }
 
-                val argsAfterJoin = args.take(cc.arguments.size - 1) +
-                        if (args.size >= cc.arguments.size)
-                            listOf(args.drop(cc.arguments.size - 1).joinToString(" "))
-                        else
-                            emptyList()
+                if (cc.arguments.isEmpty() && args.isNotEmpty()) {
+                    sender.sendError(
+                        "&sThis command doesn't take any arguments, so the &p".colored +
+                                args.joinToString(" ") + " &sthat you typed shouldn't be there".colored
+                    )
+                    cc.sendCorrectUsage(sender, labelList, emptyList())
+                    return
+                }
 
-                val parsedArgs = CParsedArguments(cc.arguments.withIndex().map { (index, cArg) ->
-                    val arg = argsAfterJoin.getOrNull(index)
+                val argsAfterJoin =
+                    if (cc.arguments.isEmpty() || args.isEmpty())
+                        emptyList()
+                    else args.take(cc.arguments.size - 1) +
+                            if (args.size >= cc.arguments.size)
+                                listOf(args.drop(cc.arguments.size - 1).joinToString(" "))
+                            else
+                                emptyList()
+
+                val parsedArgs = CParsedArguments(cc.arguments.withIndex().map { (argIndex, cArg) ->
+                    val arg = argsAfterJoin.getOrNull(argIndex)
                     if (arg != null) {
                         when (val parsed = cArg.cType.parse(arg)) {
                             is Either.Left -> parsed.a // the parsed value
                             is Either.Right -> {
                                 sender.sendHardcodedError(parsed.b) // the parse fail reason
+                                cc.sendCorrectUsage(sender, labelList, argumentIndexesToHighlight = listOf(argIndex))
                                 return@doHandle
                             }
                         }
                     } else {
-                        val value = cArg.defValue(sender)?.first
+                        val value = cArg.defValue(sender)?.value
                         if (value == null && cArg.isRequired) {
-                            sender.sendError("&sThe argument &p${cArg.name} &sis required".colored) // TODO what is this??
+                            sender.sendError("&sThe argument &p${cArg.name} &sis required".colored)
+                            cc.sendCorrectUsage(sender, labelList, argumentIndexesToHighlight = listOf(argIndex))
                             return@doHandle
                         }
                         value
@@ -64,7 +78,7 @@ open class CCommandExecutor(vararg val commands: CCommand) {
                 })
 
                 val runAsync = cc.javaClass.isAnnotationPresent(ExecuteAsync::class.java)
-                val exec = { cc.execute(sender, parsedArgs, ExecutionExtras(label)) }
+                val exec = { cc.execute(sender, parsedArgs, ExecutionExtras(labelList)) }
                 if (runAsync) {
                     runTaskAsync { exec() }
                 } else {
@@ -77,10 +91,10 @@ open class CCommandExecutor(vararg val commands: CCommand) {
             } catch (ex: CommonRequirementException) {
                 ex.requirement.sendErrorMessage(sender, ex.message)
             } catch (ex: Throwable) {
-                sender.sendError("&pAn error has occurred while attempting to perform your command".colored)
+                sender.sendError("&sAn error has occurred while attempting to perform your command".colored)
                 if (sender !is ConsoleCommandSender) {
                     sender.sendError(
-                        "The error: &p${ex.javaClass.canonicalName}" +
+                        "&sThe error: &p${ex.javaClass.canonicalName}".colored +
                                 if (ex.message == null) "" else ": " + ex.message
                     )
                 }

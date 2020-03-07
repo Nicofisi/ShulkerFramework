@@ -15,7 +15,7 @@ import java.util.*
 typealias ParseFailReason = String
 typealias ParseResult<A> = Either<A, ParseFailReason>
 
-interface CType<A> {
+interface CType<out A> {
     fun parse(string: String): ParseResult<A>
 
     /**

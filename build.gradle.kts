@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.nicofisi"
-version = "0.8.8"
+version = "0.10.3"
 
 repositories {
     maven { setUrl("https://dl.bintray.com/kotlin/kotlin-eap") }
@@ -15,6 +15,7 @@ repositories {
     jcenter()
 
     maven {
+        name = "arrow-kt-repo"
         setUrl("https://dl.bintray.com/arrow-kt/arrow-kt/")
     }
 
@@ -31,9 +32,10 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
-    implementation("net.md-5:bungeecord-api:1.15-SNAPSHOT")
     implementation("io.arrow-kt:arrow-core:0.10.4")
+
+    compileOnly("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
+    compileOnly("net.md-5:bungeecord-api:1.15-SNAPSHOT")
 }
 
 tasks {

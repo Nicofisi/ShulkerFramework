@@ -12,7 +12,10 @@ import java.time.Duration
 import java.util.logging.Logger
 import kotlin.random.Random
 
-fun randomErrorPrefix(): String = "&p[" + listOf("Oh no!", "How unfortunate", "Oops", ":(", "Well").random() + "] &s"
+fun randomErrorPrefix(): String = "&p[" + listOf(
+    "Oh no!", "How unfortunate", "Oops", ":(", "Well"
+//    "[///]"
+).random() + "] &s"
 
 val isBungee = PluginInfo.isBungee()
 
@@ -145,10 +148,18 @@ fun CommandSender.sendError(messagePath: String, vararg arguments: String) {
         message = message.replace("%$index", argument)
     }
     message = message.replace(HARDCODED_ASTERISK, "%")
-    sendMessage(randomErrorPrefix().colored + message)
+//    sendMessage(randomErrorPrefix().colored + message)
+    sendMessage(message)
 }
 
-fun CommandSender.sendHardcodedError(message: String) = sendMessage(randomErrorPrefix().colored + message)
+//fun CommandSender.sendHardcodedError(message: String) = sendMessage(randomErrorPrefix().colored + message)
+/**
+ * Currently it's no different than just [org.bukkit.command.CommandSender.sendMessage],
+ * as it doesn't include any prefix, as it used to.
+ */
+fun CommandSender.sendHardcodedError(message: String) = sendMessage(message)
+
+fun CommandSender?.getCommandPrefix() = if (this == null || this is Player) "/" else ""
 
 
 fun OfflinePlayer.toOnline(): Player? = Bukkit.getPlayerExact(name!!)
