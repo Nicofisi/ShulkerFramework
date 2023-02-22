@@ -55,7 +55,7 @@ open class CCommandExecutor(vararg val commands: CCommand) {
                     ).toMutableList()
                 }
             }
-            commandMap.register(PluginInfo.Spigot.plugin.name.toLowerCase(), command)
+            commandMap.register(PluginInfo.Spigot.plugin.name.lowercase(), command)
         }
     }
 
@@ -69,7 +69,7 @@ open class CCommandExecutor(vararg val commands: CCommand) {
         ): List<String> {
             println("sender = [${sender}], cc = [${cc}], labelList = [${labelList}], args = [${args}]")
             if (cc is CParentCommand) {
-                val lowerFirstArg = args[0].toLowerCase()
+                val lowerFirstArg = args[0].lowercase()
                 return if (args.size < 2) {
                     return cc.children.flatMap { it.aliases }.filter { it.startsWith(lowerFirstArg) }
                 } else {

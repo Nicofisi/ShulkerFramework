@@ -97,13 +97,16 @@ object DoubleType : CType<Double> {
 // TODO ExistingOfflinePlayerType and AnyOfflinePlayerTpe
 object OfflinePlayerType : CType<OfflinePlayer> {
     override fun parse(string: String): ParseResult<OfflinePlayer> {
-        @Suppress("DEPRECATION") // needed here
-        return Bukkit.getOfflinePlayer(string)?.let { Left(it) }
-            ?: try {
-                Left(Bukkit.getOfflinePlayer(UUID.fromString(string)))
-            } catch (ex: IllegalArgumentException) {
-                Right("&sNo player named &p$string &scould be found".colored)
+        return try {
+            Left(Bukkit.getOfflinePlayer(UUID.fromString(string)))
+        } catch (ex: IllegalArgumentException) {
+            @Suppress("DEPRECATION") // needed here
+            val playerByName = Bukkit.getOfflinePlayer(string)
+            if (playerByName.hasPlayedBefore() || playerByName.isOnline) {
+                return Left(playerByName)
             }
+            Right("&sNo player named &p$string &scould be found".colored)
+        }
     }
 
     override fun tabCompletions(mustStartWith: String) = PlayerType.tabCompletions(mustStartWith)

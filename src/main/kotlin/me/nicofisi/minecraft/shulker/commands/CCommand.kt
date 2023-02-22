@@ -146,7 +146,7 @@ class CParentCommand(
             }
         }
 
-        val argAlias = (args[0] as String).toLowerCase()
+        val argAlias = (args[0] as String).lowercase()
 
         if (argAlias == "help" || argAlias == "?") {
             showHelp(sender)
@@ -163,7 +163,7 @@ class CParentCommand(
     }
 
     fun findChild(alias: String): CCommand? {
-        val lowerAlias = alias.toLowerCase()
+        val lowerAlias = alias.lowercase()
 
         return children.find { it.aliases.contains(lowerAlias) }
     }

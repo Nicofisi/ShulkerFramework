@@ -7,11 +7,10 @@ plugins {
 }
 
 group = "me.nicofisi"
-version = "0.13.11"
+version = "0.14.3"
 
 repositories {
     mavenCentral()
-    jcenter()
 
     maven {
         name = "minecraft-libraries-repo"
@@ -24,13 +23,8 @@ repositories {
     }
 
     maven {
-        name = "paperspigot-repo"
-        setUrl("https://repo.destroystokyo.com/repository/maven-public/")
-    }
-
-    maven {
-        name = "bungeecord-chat-repo"
-        setUrl("https://oss.sonatype.org/content/repositories/snapshots/")
+        name = "paper-repo"
+        setUrl("https://repo.papermc.io/repository/maven-public/")
     }
 
     maven {
@@ -40,12 +34,11 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib-jdk8"))
     implementation("io.arrow-kt:arrow-core:0.10.4")
 
     compileOnly("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
-    compileOnly("net.md-5:bungeecord-api:1.15-SNAPSHOT")
-    compileOnly("com.comphenix.protocol:ProtocolLib:4.5.0")
+    compileOnly("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT")
+    compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
 //    compileOnly("com.mojang:brigadier:1.0.17")
 }
 
