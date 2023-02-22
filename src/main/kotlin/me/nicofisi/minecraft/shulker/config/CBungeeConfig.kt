@@ -1,12 +1,21 @@
 package me.nicofisi.minecraft.shulker.config
 
+import me.nicofisi.minecraft.shulker.PluginInfo
 import net.md_5.bungee.config.Configuration
 import net.md_5.bungee.config.ConfigurationProvider
 import net.md_5.bungee.config.YamlConfiguration
 import java.io.File
 import java.io.StringWriter
+import java.nio.file.Path
 
-abstract class CBungeeConfig : CConfig<Configuration>(BungeeYamlConfigurationWrapper())
+abstract class CBungeeConfig(configFile: Path, latestConfigVersion: Int) :
+    CConfig<Configuration>(configFile, BungeeYamlConfigurationWrapper(), latestConfigVersion) {
+
+    constructor(relativeFilePath: String, latestConfigVersion: Int) : this(
+        PluginInfo.Bungee.plugin.dataFolder.toPath().resolve(relativeFilePath),
+        latestConfigVersion
+    )
+}
 
 /**
  * Note: headers are not available in the Bungee config API, so ShulkerFramework uses its own method

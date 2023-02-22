@@ -9,6 +9,6 @@ import org.bukkit.entity.Player
 object ReqIsNotPlayer : CRequirement() {
     override fun check(sender: CommandSender, command: CCommand?): Boolean = sender !is Player
 
-    override fun createErrorMessage(sender: CommandSender, action: String): String =
+    override fun createErrorMessage(sender: CommandSender?, action: String): String =
         "&sOnly the console and command blocks are able to &p$action".colored
 }

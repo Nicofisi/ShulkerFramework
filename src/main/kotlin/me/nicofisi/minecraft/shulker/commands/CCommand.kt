@@ -25,9 +25,11 @@ interface CCommand {
                 defValue != null -> {
                     "[" + arg.name + "=" + defValue.textToDisplay + "]"
                 }
+
                 arg.isRequired -> {
                     "<" + arg.name + ">"
                 }
+
                 else -> {
                     "[" + arg.name + "]"
                 }
@@ -37,7 +39,11 @@ interface CCommand {
         }
     }
 
-    fun getCorrectUsage(sender: CommandSender?, labelList: List<String>, argumentIndexesToHighlight: List<Int>): String {
+    fun getCorrectUsage(
+        sender: CommandSender?,
+        labelList: List<String>,
+        argumentIndexesToHighlight: List<Int>
+    ): String {
         return "&p".colored +
                 sender.getCommandPrefix() +
                 labelList.joinToString(" ") +
@@ -89,71 +95,76 @@ object CCommandNoArgs {
     }
 }
 
-object CParentCommand {
-    operator fun invoke(
-        cmdAliases: List<String>, helpDesc: String,
-        vararg children: CCommand
-    ): CCommand = object : CCommand {
-        @Suppress("UnnecessaryVariable") // an IntelliJ bug
-        override val aliases = cmdAliases
-        override val helpDescription = helpDesc
-        override val arguments = listOf(
-            CArgument(StringType, "subcommand", defValue = { DefaultArgumentValue("help", "help") }),
-            CArgument(StringType, "arguments", isRequired = false)
-        )
-        override val requirements = emptyList<CRequirement>()
+class CParentCommand(
+    cmdAliases: List<String>,
+    helpDesc: String,
+    vararg val children: CCommand
+) : CCommand {
+    @Suppress("UnnecessaryVariable") // an IntelliJ bug
+    override val aliases = cmdAliases
+    override val helpDescription = helpDesc
+    override val arguments = listOf(
+        CArgument(StringType, "subcommand", defValue = { DefaultArgumentValue("help", "help") }),
+        CArgument(StringType, "arguments", isRequired = false)
+    )
+    override val requirements = emptyList<CRequirement>()
 
-        // TODO multiple help pages
-        override fun execute(sender: CommandSender, args: CParsedArguments, extras: ExecutionExtras) {
+    // TODO multiple help pages
+    override fun execute(sender: CommandSender, args: CParsedArguments, extras: ExecutionExtras) {
 
-            /**
-             * @param unknownSubcommand If showing help is triggered by stumbling upon an unknown subcommand argument,
-             * an error line is sent first, explaining what happened
-             */
-            fun showHelp(sender: CommandSender, unknownSubcommand: String? = null) {
-                if (unknownSubcommand != null) {
-                    sender.sendMessage("&sCommand &p/${extras.label} &t".colored + unknownSubcommand + " &scould not be found".colored)
-                }
-                sender.sendHeader("Help for &p".colored + sender.getCommandPrefix() + extras.label)
-                if (children.isEmpty()) {
-                    sender.sendMessage("&s&o".colored + "This command has no subcommands")
-                }
-                children.forEach { child ->
-                    /*
-                     * Examples:
-                     *   /nav location <x> <y> <z> - does something
-                     *   navigate stop [player=Notch] - does something else
-                     */
-                    sender.sendMessage(
-                        "&s".colored +
-                                sender.getCommandPrefix() +
-                                extras.label +
-                                " &t".colored +
-                                child.aliases.first() +
-                                " " +
-                                child.getHelpForArguments(sender, argumentIndexesToHighlight = emptyList()).let {
-                                    if (it.isEmpty()) it else "$it "
-                                } +
-                                "&s- ".colored +
-                                child.helpDescription
-                    )
-                }
+        /**
+         * @param unknownSubcommand If showing help is triggered by stumbling upon an unknown subcommand argument,
+         * an error line is sent first, explaining what happened
+         */
+        fun showHelp(sender: CommandSender, unknownSubcommand: String? = null) {
+            if (unknownSubcommand != null) {
+                sender.sendMessage("&sCommand &p/${extras.label} &t".colored + unknownSubcommand + " &scould not be found".colored)
             }
-
-            val argAlias = (args[0] as String).toLowerCase()
-
-            if (argAlias == "help" || argAlias == "?") {
-                showHelp(sender)
-            } else {
-                val argArgs = (args[1] as String?)?.split(" ") ?: emptyList()
-
-                val child = children.find { it.aliases.contains(argAlias) }
-                if (child != null) {
-                    CCommandExecutor.handleCCommand(sender, child, extras.labelList + argAlias, argArgs)
-                } else {
-                    showHelp(sender, argAlias)
-                }
+            sender.sendHeader("Help for &p".colored + sender.getCommandPrefix() + extras.label)
+            if (children.isEmpty()) {
+                sender.sendMessage("&s&o".colored + "This command has no subcommands")
+            }
+            children.forEach { child ->
+                /*
+                 * Examples:
+                 *   /nav location <x> <y> <z> - does something
+                 *   navigate stop [player=Notch] - does something else
+                 */
+                sender.sendMessage(
+                    "&s".colored +
+                            sender.getCommandPrefix() +
+                            extras.label +
+                            " &t".colored +
+                            child.aliases.first() +
+                            " " +
+                            child.getHelpForArguments(sender, argumentIndexesToHighlight = emptyList()).let {
+                                if (it.isEmpty()) it else "$it "
+                            } +
+                            "&s- ".colored +
+                            child.helpDescription
+                )
             }
         }
+
+        val argAlias = (args[0] as String).toLowerCase()
+
+        if (argAlias == "help" || argAlias == "?") {
+            showHelp(sender)
+        } else {
+            val child = findChild(argAlias)
+            if (child != null) {
+                val argArgs = (args[1] as String?)?.split(" ") ?: emptyList()
+
+                CCommandExecutor.handleCCommand(sender, child, extras.labelList + argAlias, argArgs)
+            } else {
+                showHelp(sender, argAlias)
+            }
+        }
+    }
+
+    fun findChild(alias: String): CCommand? {
+        val lowerAlias = alias.toLowerCase()
+
+        return children.find { it.aliases.contains(lowerAlias) }
     }
 }

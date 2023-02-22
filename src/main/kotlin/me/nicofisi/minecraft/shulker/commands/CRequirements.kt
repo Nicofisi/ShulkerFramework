@@ -6,9 +6,9 @@ import org.bukkit.command.CommandSender
 abstract class CRequirement {
     abstract fun check(sender: CommandSender, command: CCommand?): Boolean
 
-    abstract fun createErrorMessage(sender: CommandSender, action: String): String
+    abstract fun createErrorMessage(sender: CommandSender?, action: String): String
 
-    open fun createErrorMessage(sender: CommandSender, command: CCommand? = null): String =
+    open fun createErrorMessage(sender: CommandSender?, command: CCommand? = null): String =
         createErrorMessage(sender, getAction(command))
 
     open fun getAction(command: CCommand? = null) =

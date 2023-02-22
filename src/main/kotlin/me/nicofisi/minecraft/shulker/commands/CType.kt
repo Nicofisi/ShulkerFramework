@@ -25,7 +25,7 @@ interface CType<out A> {
      * @param mustStartWith the string; implementations are allowed to return an empty list when
      *                      the length of this string is lower than some given small number
      */
-    fun tabSuggestions(mustStartWith: String): List<String> = emptyList()
+    fun tabCompletions(mustStartWith: String): List<String> = emptyList()
 }
 
 object BooleanType : CType<Boolean> {
@@ -33,6 +33,10 @@ object BooleanType : CType<Boolean> {
         "yes", "true", "y", "t" -> Left(true)
         "no", "false", "n", "f" -> Left(false)
         else -> Right("&sYou typed &p$string in a place where only &pyes &sor &pno &sshould be used".colored)
+    }
+
+    override fun tabCompletions(mustStartWith: String): List<String> {
+        return listOf("true", "false").filter { it.startsWith(mustStartWith, ignoreCase = true) }
     }
 }
 
@@ -45,9 +49,9 @@ object GameModeType : CType<GameMode> {
         else -> Right("&sGame mode called &p$string &sdoesn't exist".colored)
     }
 
-    override fun tabSuggestions(mustStartWith: String) =
+    override fun tabCompletions(mustStartWith: String) =
         listOf("survival", "creative", "adventure", "spectator")
-            .filter { it.startsWith(mustStartWith.toLowerCase()) }
+            .filter { it.startsWith(mustStartWith, ignoreCase = true) }
 }
 
 object IntegerType : CType<Int> {
@@ -102,7 +106,7 @@ object OfflinePlayerType : CType<OfflinePlayer> {
             }
     }
 
-    override fun tabSuggestions(mustStartWith: String) = PlayerType.tabSuggestions(mustStartWith)
+    override fun tabCompletions(mustStartWith: String) = PlayerType.tabCompletions(mustStartWith)
 
     // TODO find a way faster way
     // than Bukkit.getOfflinePlayers.asScala.map(_.getName).filter(_.startsWith(mustStartWith))
@@ -125,6 +129,11 @@ object PlayerType : CType<Player> {
                 }
             }
     }
+
+    override fun tabCompletions(mustStartWith: String): List<String> {
+        return Bukkit.getOnlinePlayers().toList().map { it.name }
+            .filter { it.startsWith(mustStartWith, ignoreCase = true) }
+    }
 }
 
 object StringType : CType<String> {
@@ -146,6 +155,6 @@ object WorldType : CType<World> {
         }
     }
 
-    override fun tabSuggestions(mustStartWith: String) =
+    override fun tabCompletions(mustStartWith: String) =
         Bukkit.getWorlds().map { it.name }.filter { it.startsWith(mustStartWith, ignoreCase = true) }
 }

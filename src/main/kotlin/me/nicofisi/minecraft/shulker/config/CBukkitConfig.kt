@@ -1,9 +1,18 @@
 package me.nicofisi.minecraft.shulker.config
 
+import me.nicofisi.minecraft.shulker.PluginInfo
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
+import java.nio.file.Path
 
-abstract class CBukkitConfig : CConfig<YamlConfiguration>(BukkitYamlConfigurationWrapper())
+abstract class CBukkitConfig(configFile: Path, latestConfigVersion: Int) :
+    CConfig<YamlConfiguration>(configFile, BukkitYamlConfigurationWrapper(), latestConfigVersion) {
+
+    constructor(relativeFilePath: String, latestConfigVersion: Int) : this(
+        PluginInfo.Spigot.plugin.dataFolder.toPath().resolve(relativeFilePath),
+        latestConfigVersion
+    )
+}
 
 class BukkitYamlConfigurationWrapper : YamlConfigurationWrapper<YamlConfiguration>() {
     override fun loadFromFile(file: File): YamlConfiguration = YamlConfiguration.loadConfiguration(file)

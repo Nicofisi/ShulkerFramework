@@ -1,18 +1,22 @@
-import groovy.util.NodeList
 import groovy.util.Node
+import groovy.util.NodeList
 
 plugins {
-    kotlin("jvm") version "1.3.70-eap-42"
+    kotlin("jvm") version "1.8.10"
     `maven-publish`
 }
 
 group = "me.nicofisi"
-version = "0.10.3"
+version = "0.13.11"
 
 repositories {
-    maven { setUrl("https://dl.bintray.com/kotlin/kotlin-eap") }
     mavenCentral()
     jcenter()
+
+    maven {
+        name = "minecraft-libraries-repo"
+        setUrl("https://libraries.minecraft.net")
+    }
 
     maven {
         name = "arrow-kt-repo"
@@ -28,6 +32,11 @@ repositories {
         name = "bungeecord-chat-repo"
         setUrl("https://oss.sonatype.org/content/repositories/snapshots/")
     }
+
+    maven {
+        name = "protocollib-repo"
+        setUrl("https://repo.dmulloy2.net/nexus/repository/public/")
+    }
 }
 
 dependencies {
@@ -36,14 +45,16 @@ dependencies {
 
     compileOnly("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
     compileOnly("net.md-5:bungeecord-api:1.15-SNAPSHOT")
+    compileOnly("com.comphenix.protocol:ProtocolLib:4.5.0")
+//    compileOnly("com.mojang:brigadier:1.0.17")
 }
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "17"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "11"
+        kotlinOptions.jvmTarget = "17"
     }
     publishToMavenLocal {
         dependsOn(build)

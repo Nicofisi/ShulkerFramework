@@ -2,30 +2,57 @@ package me.nicofisi.minecraft.shulker.commands
 
 import arrow.core.Either
 import me.nicofisi.minecraft.shulker.PluginInfo
+import me.nicofisi.minecraft.shulker.requirements.ReqHasPermission
 import me.nicofisi.minecraft.shulker.utils.colored
 import me.nicofisi.minecraft.shulker.utils.runTaskAsync
 import me.nicofisi.minecraft.shulker.utils.sendError
 import me.nicofisi.minecraft.shulker.utils.sendHardcodedError
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.ConsoleCommandSender
 
 open class CCommandExecutor(vararg val commands: CCommand) {
 
+    @Suppress("unused")
     fun registerCommands() {
         val commandMap = Bukkit.getServer().commandMap
         commands.forEach { cc ->
             val command = object : Command(cc.aliases.first()) {
                 init {
+                    val firstPermissionRequirement = cc.requirements
+                        .filterIsInstance(ReqHasPermission::class.java).firstOrNull()
                     this.description = cc.helpDescription
                     this.usageMessage = cc.getCorrectUsage(null, listOf(cc.aliases.first()), emptyList())
                     this.aliases = cc.aliases
+                    this.permission = firstPermissionRequirement?.permission
+                    this.permissionMessage = firstPermissionRequirement
+                        ?.createErrorMessage(null, cc)
                 }
 
                 override fun execute(sender: CommandSender, commandLabel: String, args: Array<out String>): Boolean {
                     handleCCommand(sender, cc, listOf(commandLabel), args.toList())
                     return true
+                }
+
+                override fun tabComplete(
+                    sender: CommandSender,
+                    alias: String,
+                    args: Array<out String>
+                ): MutableList<String> {
+                    return tabComplete(sender, cc, listOf(alias), args.toList()).toMutableList()
+                }
+
+                override fun tabComplete(
+                    sender: CommandSender,
+                    alias: String,
+                    args: Array<out String>,
+                    targetLocation: Location?
+                ): MutableList<String> {
+                    return tabComplete(
+                        sender, cc, listOf(alias), args.toList(), targetLocation
+                    ).toMutableList()
                 }
             }
             commandMap.register(PluginInfo.Spigot.plugin.name.toLowerCase(), command)
@@ -33,6 +60,27 @@ open class CCommandExecutor(vararg val commands: CCommand) {
     }
 
     companion object {
+        fun tabComplete(
+            sender: CommandSender,
+            cc: CCommand,
+            labelList: List<String>,
+            args: List<String>,
+            targetLocation: Location? = null
+        ): List<String> {
+            println("sender = [${sender}], cc = [${cc}], labelList = [${labelList}], args = [${args}]")
+            if (cc is CParentCommand) {
+                val lowerFirstArg = args[0].toLowerCase()
+                return if (args.size < 2) {
+                    return cc.children.flatMap { it.aliases }.filter { it.startsWith(lowerFirstArg) }
+                } else {
+                    cc.findChild(lowerFirstArg)?.let {
+                        tabComplete(sender, it, labelList + lowerFirstArg, args.drop(1), targetLocation)
+                    } ?: emptyList()
+                }
+            }
+            return cc.arguments[args.size - 1].tabCompletions(args.last(), targetLocation)
+        }
+
         fun handleCCommand(sender: CommandSender, cc: CCommand, labelList: List<String>, args: List<String>) {
             fun doHandle() {
                 cc.requirements.forEach { it.validate(sender, cc) }

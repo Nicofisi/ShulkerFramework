@@ -9,6 +9,6 @@ import org.bukkit.entity.Player
 object ReqIsOp : CRequirement() {
     override fun check(sender: CommandSender, command: CCommand?): Boolean = sender.isOp
 
-    override fun createErrorMessage(sender: CommandSender, action: String): String =
+    override fun createErrorMessage(sender: CommandSender?, action: String): String =
         "&pYou need to be a server operator to &p$action".colored
 }

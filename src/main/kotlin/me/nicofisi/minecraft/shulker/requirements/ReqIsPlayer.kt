@@ -9,6 +9,6 @@ import org.bukkit.entity.Player
 object ReqIsPlayer : CRequirement() {
     override fun check(sender: CommandSender, command: CCommand?): Boolean = sender is Player
 
-    override fun createErrorMessage(sender: CommandSender, action: String): String =
+    override fun createErrorMessage(sender: CommandSender?, action: String): String =
         "&pYou can only &p$action &sin-game, as player".colored
 }
