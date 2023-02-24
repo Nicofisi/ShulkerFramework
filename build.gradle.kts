@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.nicofisi"
-version = "0.14.3"
+version = "0.14.4"
 
 repositories {
     mavenCentral()
@@ -36,7 +36,7 @@ repositories {
 dependencies {
     implementation("io.arrow-kt:arrow-core:0.10.4")
 
-    compileOnly("com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.19.3-R0.1-SNAPSHOT")
     compileOnly("net.md-5:bungeecord-api:1.19-R0.1-SNAPSHOT")
     compileOnly("com.comphenix.protocol:ProtocolLib:4.8.0")
 //    compileOnly("com.mojang:brigadier:1.0.17")
